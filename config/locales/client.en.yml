@@ -3,7 +3,7 @@ en:
     admin:
       site_settings:
         categories:
-          TODO_plugin_name: "Plugin Name"
+          cs_discourse_onedrive: "Clear Star Discourse OneDrive Integration"
   js:
-    discourse_plugin_name:
+    cs_discourse_onedrive:
       placeholder: placeholder

@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
-# name: discourse-plugin-name
-# about: TODO
+# name: cs-discourse-onedrive
+# about: Clear Star Discourse Plugin to integrate OneDrive folders with topics
 # meta_topic_id: TODO
 # version: 0.0.1
-# authors: Discourse
+# authors: Clear Star
 # url: TODO
 # required_version: 2.7.0
 
-enabled_site_setting :plugin_name_enabled
+enabled_site_setting :cs_discourse_onedrive_enabled
 
-module ::MyPluginModule
-  PLUGIN_NAME = "discourse-plugin-name"
+module ::CsDiscourseOneDriveModule
+  PLUGIN_NAME = "cs-discourse-onedrive"
 end
 
-require_relative "lib/my_plugin_module/engine"
+require_relative "lib/cs_discourse_onedrive_module/engine"
 
 after_initialize do
-  # Code which should run after Rails has finished booting
+  require_relative "app/controllers/cs_discourse_onedrive_module/examples_controller"
 end
