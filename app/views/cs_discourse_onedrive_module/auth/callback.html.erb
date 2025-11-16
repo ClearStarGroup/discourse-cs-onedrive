@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Connecting to OneDrive…</title>
+    <script src="<%= Discourse.base_path %>/plugins/cs-discourse-onedrive/javascripts/vendor/msal-browser.min.js" nonce="<%= csp_nonce_placeholder %>"></script>
+  </head>
+  <body>
+    <script nonce="<%= csp_nonce_placeholder %>">
+    (async function () {
+      if (!window.msal) {
+        console.error("MSAL library not available");
+        window.location.replace("<%= Discourse.base_path %>");
+        return;
+      }
+
+      const configuration = {
+        auth: {
+          clientId: "<%= SiteSetting.cs_discourse_onedrive_client_id %>",
+          authority: "https://login.microsoftonline.com/<%= SiteSetting.cs_discourse_onedrive_tenant_id.presence || "common" %>",
+          redirectUri: "<%= Discourse.base_url %>/cs-discourse-onedrive/auth/callback",
+        },
+        cache: {
+          cacheLocation: "sessionStorage",
+          storeAuthStateInCookie: true,
+        },
+      };
+
+      try {
+        const client = new msal.PublicClientApplication(configuration);
+        if (client.initialize) {
+          await client.initialize();
+        }
+        await client.handleRedirectPromise();
+      } catch (e) {
+        console.error("MSAL redirect handling failed", e);
+      } finally {
+        const target =
+          sessionStorage.getItem("csod.msal.redirect") ||
+          sessionStorage.getItem("msal.redirectUri") ||
+          "<%= Discourse.base_path %>";
+        sessionStorage.removeItem("csod.msal.redirect");
+        window.location.replace(target);
+      }
+    })();
+    </script>
+  </body>
+</html>
+

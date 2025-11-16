@@ -1,1 +1,8 @@
 en:
+  site_settings:
+    cs_discourse_onedrive_enabled: "Enable the Clear Star OneDrive integration"
+    cs_discourse_onedrive_client_id: "Microsoft application (client) ID"
+    cs_discourse_onedrive_tenant_id: "Azure AD tenant ID (use 'common' for multi-tenant apps)"
+  cs_discourse_onedrive:
+    errors:
+      missing_folder_params: "Drive ID and item ID are required."

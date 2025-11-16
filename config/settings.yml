@@ -1,4 +1,10 @@
-cs_discourse_onedrive:
+plugins:
   cs_discourse_onedrive_enabled:
     default: false
+    client: true
+  cs_discourse_onedrive_client_id:
+    default: ""
+    client: true
+  cs_discourse_onedrive_tenant_id:
+    default: "common"
     client: true
