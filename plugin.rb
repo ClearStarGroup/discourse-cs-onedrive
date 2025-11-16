@@ -10,6 +10,9 @@
 
 enabled_site_setting :cs_discourse_onedrive_enabled
 
+register_asset "stylesheets/common/cs-discourse-onedrive.scss"
+register_svg_icon "cloud"
+
 module ::CsDiscourseOneDriveModule
   PLUGIN_NAME = "cs-discourse-onedrive"
 

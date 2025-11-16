@@ -11,6 +11,7 @@ import msalLib, {
 import graphLib from "discourse/plugins/cs-discourse-onedrive/discourse/lib/microsoft-graph-client";
 import DButton from "discourse/components/d-button";
 import loadingSpinner from "discourse/helpers/loading-spinner";
+import icon from "discourse/helpers/d-icon";
 import { i18n } from "discourse-i18n";
 import { getAbsoluteURL } from "discourse-common/lib/get-url";
 const GRAPH_SCOPES = ["Files.Read.All"];
@@ -1033,149 +1034,210 @@ export default class CsDiscourseOnedrivePanel extends Component {
 
   <template>
     {{#if this.shouldRender}}
-      <div class="cs-onedrive-panel topic-body clearfix">
-        {{#unless this.isConfigured}}
-          {{#if this.canManage}}
-            <div class="alert alert-error">
-              {{i18n "cs_discourse_onedrive.not_configured"}}
+      {{#unless this.isConfigured}}
+        {{#if this.canManage}}
+          <div class="post__row row">
+            <div class="post__body topic-body clearfix">
+              <div class="alert alert-error">
+                {{i18n "cs_discourse_onedrive.not_configured"}}
+              </div>
             </div>
-          {{/if}}
-        {{else}}
-          {{#if this.errorMessage}}
-            <div class="alert alert-error">
-              {{this.errorMessage}}
+          </div>
+        {{/if}}
+      {{else}}
+        {{#if this.errorMessage}}
+          <div class="post__row row">
+            <div class="post__body topic-body clearfix">
+              <div class="alert alert-error">
+                {{this.errorMessage}}
+              </div>
             </div>
-          {{/if}}
+          </div>
+        {{/if}}
 
-          {{#if this.account}}
-            <div class="cs-onedrive-panel__auth-status">
-              <span>{{this.signedInLabel}}</span>
-              <DButton
-                @label="cs_discourse_onedrive.sign_out"
-                @action={{this.signOut}}
-                @disabled={{this.loading}}
-                class="btn btn-small"
-              />
-            </div>
-          {{else}}
-            <div class="cs-onedrive-panel__auth-gate">
-              <p>{{i18n "cs_discourse_onedrive.sign_in_required"}}</p>
-              <DButton
-                @label="cs_discourse_onedrive.sign_in"
-                @action={{this.signIn}}
-                @disabled={{this.loading}}
-                class="btn btn-primary"
-              />
-            </div>
-          {{/if}}
+        {{#if this.account}}
+          {{#if this.folderLinked}}
+            <div class="post__row row">
+              <div class="topic-avatar cs-onedrive-avatar">
+                {{icon "cloud"}}
+              </div>
 
-          {{#if this.account}}
-            <div class="cs-onedrive-panel__body">
-              {{#if this.folderLinked}}
-                <div class="cs-onedrive-panel__header">
-                  <div>
-                    <strong>{{i18n
-                        "cs_discourse_onedrive.folder_linked"
-                      }}:</strong>
-                    {{#if this.folder.web_url}}
-                      <a
-                        href={{this.folder.web_url}}
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        {{this.folder.name}}
-                      </a>
-                    {{else}}
-                      {{this.folder.name}}
-                    {{/if}}
+              <div class="post__body topic-body clearfix">
+                <div class="topic-meta-data">
+                  <div class="names">
+                    <span class="first username cs-onedrive-header">
+                      {{i18n "cs_discourse_onedrive.section_header"}}
+                    </span>
                   </div>
+
                   {{#if this.canManage}}
-                    <div class="cs-onedrive-panel__actions">
-                      <DButton
-                        @label="cs_discourse_onedrive.refresh"
-                        @action={{this.refreshFiles}}
-                        @disabled={{this.refreshing}}
-                        class="btn btn-small"
-                      />
-                      <DButton
-                        @label="cs_discourse_onedrive.change_folder"
-                        @action={{this.changeFolder}}
-                        @disabled={{this.linking}}
-                        class="btn btn-small"
-                      />
-                      <DButton
-                        @label="cs_discourse_onedrive.remove_folder"
-                        @action={{this.removeFolder}}
-                        class="btn btn-danger btn-small"
-                      />
+                    <div class="post-infos">
+                      <div class="actions">
+                        <DButton
+                          @icon="arrows-rotate"
+                          @title="cs_discourse_onedrive.refresh"
+                          @action={{this.refreshFiles}}
+                          @disabled={{this.refreshing}}
+                          class="btn no-text btn-icon post-action-menu__refresh btn-flat"
+                        />
+                        <DButton
+                          @icon="folder"
+                          @title="cs_discourse_onedrive.change_folder"
+                          @action={{this.changeFolder}}
+                          @disabled={{this.linking}}
+                          class="btn no-text btn-icon post-action-menu__change-folder btn-flat"
+                        />
+                        <DButton
+                          @icon="trash-can"
+                          @title="cs_discourse_onedrive.remove_folder"
+                          @action={{this.removeFolder}}
+                          class="btn no-text btn-icon post-action-menu__remove btn-flat btn-danger"
+                        />
+                        <DButton
+                          @icon="right-from-bracket"
+                          @title="cs_discourse_onedrive.sign_out"
+                          @action={{this.signOut}}
+                          @disabled={{this.loading}}
+                          class="btn no-text btn-icon post-action-menu__logout btn-flat"
+                        />
+                      </div>
                     </div>
                   {{/if}}
                 </div>
 
-                {{#if this.refreshing}}
-                  <div class="cs-onedrive-panel__spinner">
-                    {{loadingSpinner}}
-                    <span>{{i18n "cs_discourse_onedrive.fetching_files"}}</span>
-                  </div>
-                {{else if this.hasLoadedFiles}}
-                  {{#if this.files.length}}
-                    <ul class="cs-onedrive-panel__list">
-                      {{#each this.files as |file|}}
-                        <li>
-                          {{#if file.webUrl}}
-                            <a
-                              href={{file.webUrl}}
-                              target="_blank"
-                              rel="noopener"
-                            >
+                <div class="post__regular regular post__contents contents">
+                  <div class="cooked">
+                    <p>
+                      {{#if this.folder.web_url}}
+                        <a
+                          href={{this.folder.web_url}}
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {{this.folder.name}}
+                        </a>
+                      {{else}}
+                        {{this.folder.name}}
+                      {{/if}}
+                    </p>
+                    {{#if this.refreshing}}
+                      <div class="cs-onedrive-panel__spinner">
+                        {{loadingSpinner}}
+                        <span>{{i18n
+                            "cs_discourse_onedrive.fetching_files"
+                          }}</span>
+                      </div>
+                    {{else if this.hasLoadedFiles}}
+                      {{#if this.files.length}}
+                        <ul class="cs-onedrive-panel__list">
+                          {{#each this.files as |file|}}
+                            <li>
+                              {{#if file.webUrl}}
+                                <a
+                                  href={{file.webUrl}}
+                                  target="_blank"
+                                  rel="noopener"
+                                >
+                                  {{file.name}}
+                                </a>
+                              {{else}}
+                                {{file.name}}
+                              {{/if}}
+                            </li>
+                          {{/each}}
+                        </ul>
+                      {{else}}
+                        <p>{{i18n "cs_discourse_onedrive.no_files"}}</p>
+                      {{/if}}
+                    {{else if this.files}}
+                      <ul class="cs-onedrive-panel__list">
+                        {{#each this.files as |file|}}
+                          <li>
+                            {{#if file.webUrl}}
+                              <a
+                                href={{file.webUrl}}
+                                target="_blank"
+                                rel="noopener"
+                              >
+                                {{file.name}}
+                              </a>
+                            {{else}}
                               {{file.name}}
-                            </a>
-                          {{else}}
-                            {{file.name}}
-                          {{/if}}
-                        </li>
-                      {{/each}}
-                    </ul>
-                  {{else}}
-                    <p>{{i18n "cs_discourse_onedrive.no_files"}}</p>
-                  {{/if}}
-                {{else if this.files}}
-                  <ul class="cs-onedrive-panel__list">
-                    {{#each this.files as |file|}}
-                      <li>
-                        {{#if file.webUrl}}
-                          <a
-                            href={{file.webUrl}}
-                            target="_blank"
-                            rel="noopener"
-                          >
-                            {{file.name}}
-                          </a>
-                        {{else}}
-                          {{file.name}}
-                        {{/if}}
-                      </li>
-                    {{/each}}
-                  </ul>
-                {{/if}}
-              {{else}}
-                <div class="cs-onedrive-panel__empty">
-                  <p>{{i18n "cs_discourse_onedrive.no_folder_linked"}}</p>
-                  {{#if this.canManage}}
-                    <p>{{i18n "cs_discourse_onedrive.folder_link_help"}}</p>
-                    <DButton
-                      @label="cs_discourse_onedrive.link_folder"
-                      @action={{this.linkFolder}}
-                      @disabled={{this.linking}}
-                      class="btn btn-primary"
-                    />
-                  {{/if}}
+                            {{/if}}
+                          </li>
+                        {{/each}}
+                      </ul>
+                    {{/if}}
+                  </div>
                 </div>
-              {{/if}}
+              </div>
+            </div>
+          {{else}}
+            <div class="post__row row">
+              <div class="topic-avatar cs-onedrive-avatar">
+                {{icon "cloud"}}
+              </div>
+
+              <div class="post__body topic-body clearfix">
+                <div class="topic-meta-data">
+                  <div class="names">
+                    <span class="first username cs-onedrive-header">
+                      {{i18n "cs_discourse_onedrive.section_header"}}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="post__regular regular post__contents contents">
+                  <div class="cooked">
+                    {{#if this.canManage}}
+                      <p>{{i18n "cs_discourse_onedrive.folder_link_help"}}</p>
+                      <DButton
+                        @label="cs_discourse_onedrive.link_folder"
+                        @action={{this.linkFolder}}
+                        @disabled={{this.linking}}
+                        class="btn btn-primary"
+                      />
+                    {{/if}}
+                  </div>
+                </div>
+              </div>
             </div>
           {{/if}}
-        {{/unless}}
-      </div>
+        {{else}}
+          <div class="post__row row">
+            <div class="topic-avatar">
+              <svg
+                class="fa d-icon d-icon-cloud svg-icon svg-string"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <use href="#cloud"></use>
+              </svg>
+            </div>
+
+            <div class="post__body topic-body clearfix">
+              <div class="topic-meta-data">
+                <div class="names">
+                  <span class="first username">
+                    {{i18n "cs_discourse_onedrive.sign_in_required"}}
+                  </span>
+                </div>
+              </div>
+
+              <div class="post__regular regular post__contents contents">
+                <div class="cooked">
+                  <DButton
+                    @label="cs_discourse_onedrive.sign_in"
+                    @action={{this.signIn}}
+                    @disabled={{this.loading}}
+                    class="btn btn-primary"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        {{/if}}
+      {{/unless}}
     {{/if}}
   </template>
 }
