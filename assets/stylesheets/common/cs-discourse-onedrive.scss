@@ -19,17 +19,95 @@
   gap: 0.5em;
 }
 
-.cs-onedrive-panel__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.cs-onedrive-panel__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
 
-  > li {
-    padding: 0.25em 0;
-    border-bottom: 1px solid var(--primary-very-low);
+  thead {
+    tr {
+      border-bottom: 2px solid var(--primary-very-low);
 
-    &:last-child {
-      border-bottom: none;
+      th {
+        text-align: left;
+        padding: 0.4em 0.75em;
+        font-weight: 600;
+        color: var(--primary-medium);
+        font-size: 0.85em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &:first-child {
+          width: 2em;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--primary-very-low);
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: var(--primary-very-low);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 0.5em 0.75em;
+        vertical-align: middle;
+
+        &.cs-onedrive-panel__icon-cell {
+          text-align: center;
+          width: 2em;
+          color: var(--primary-medium);
+
+          svg {
+            width: 1.1em;
+            height: 1.1em;
+          }
+        }
+
+        &.cs-onedrive-panel__name-cell {
+          font-weight: 500;
+          font-size: 0.95em;
+
+          a {
+            color: var(--primary);
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+              color: var(--tertiary);
+            }
+          }
+        }
+
+        &.cs-onedrive-panel__date-cell {
+          color: var(--primary-medium);
+          font-size: 0.85em;
+          white-space: nowrap;
+        }
+
+        &.cs-onedrive-panel__type-cell {
+          color: var(--primary-medium);
+          font-size: 0.85em;
+          text-transform: uppercase;
+          font-weight: 500;
+        }
+
+        &.cs-onedrive-panel__size-cell {
+          color: var(--primary-medium);
+          font-size: 0.85em;
+          text-align: right;
+          white-space: nowrap;
+        }
+      }
     }
   }
 }

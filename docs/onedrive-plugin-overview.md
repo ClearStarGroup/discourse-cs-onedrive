@@ -56,11 +56,16 @@ http://localhost:4200
 
 **TODO**
 
-- Remove pnpm packages, and update spec and instructions to download from unpkg
+- Sort out styling and layout (better buttons, use Discourse styles)
+- Move folder list to table
+- Small action post update on setting, changing, or clearing linked folder
+- Support navigating into folders in panel
+- Insert file button in editor (see other plugin)
 - Remove picker callback?
+- Remove pnpm packages, and update spec and instructions to download from unpkg
 - Move picker code to stand-alone lib
 - Remove dependancy on graph lib (create our own lib)
 - Rationalise msal to a single lib (rather than two)
-- Sort out styling and layout (table, better buttons, use Discourse styles)
 - Constrain picker (maybe to site configured in settings)
 - Review of all code
+- Rename plugin (discourse_cs_ondrive??)

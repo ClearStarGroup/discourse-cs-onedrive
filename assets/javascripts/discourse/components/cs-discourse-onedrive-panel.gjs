@@ -12,6 +12,8 @@ import graphLib from "discourse/plugins/cs-discourse-onedrive/discourse/lib/micr
 import DButton from "discourse/components/d-button";
 import loadingSpinner from "discourse/helpers/loading-spinner";
 import icon from "discourse/helpers/d-icon";
+import formatDate from "discourse/helpers/format-date";
+import I18n from "discourse-i18n";
 import { i18n } from "discourse-i18n";
 import { getAbsoluteURL } from "discourse-common/lib/get-url";
 const GRAPH_SCOPES = ["Files.Read.All"];
@@ -98,6 +100,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
   @tracked folder = this._initialFolder();
   @tracked files = null;
   @tracked hasLoadedFiles = false;
+  @tracked folderPath = null;
 
   constructor() {
     super(...arguments);
@@ -140,6 +143,92 @@ export default class CsDiscourseOnedrivePanel extends Component {
       this.account.username || this.account.name || this.account.localAccountId;
 
     return i18n("cs_discourse_onedrive.signed_in_as", { email });
+  }
+
+  getFileTypeIcon(file) {
+    if (file.folder) {
+      return "folder";
+    }
+
+    const name = file.name || "";
+    const extension = name.split(".").pop()?.toLowerCase() || "";
+
+    // Image types
+    if (
+      ["jpg", "jpeg", "png", "gif", "svg", "webp", "ico", "bmp"].includes(
+        extension
+      )
+    ) {
+      return "image";
+    }
+
+    // Video types
+    if (
+      ["mp4", "mov", "avi", "webm", "mkv", "flv", "wmv"].includes(extension)
+    ) {
+      return "video";
+    }
+
+    // Audio types
+    if (["mp3", "wav", "ogg", "flac", "aac", "m4a"].includes(extension)) {
+      return "music";
+    }
+
+    // Archive types
+    if (["zip", "rar", "7z", "tar", "gz", "bz2", "xz"].includes(extension)) {
+      return "file-zipper";
+    }
+
+    // Document types - specific icons
+    if (["pdf"].includes(extension)) {
+      return "file-pdf";
+    }
+    if (["doc", "docx"].includes(extension)) {
+      return "file-word";
+    }
+    if (["xls", "xlsx"].includes(extension)) {
+      return "file-excel";
+    }
+    if (["ppt", "pptx"].includes(extension)) {
+      return "file-powerpoint";
+    }
+    if (["csv"].includes(extension)) {
+      return "file-csv";
+    }
+    if (["txt", "md", "rtf"].includes(extension)) {
+      return "file-lines";
+    }
+
+    // Default file icon
+    return "file";
+  }
+
+  getFileTypeName(file) {
+    if (file.folder) {
+      return "Folder";
+    }
+
+    const name = file.name || "";
+    const extension = name.split(".").pop()?.toUpperCase() || "";
+
+    if (extension) {
+      return extension;
+    }
+
+    // Try to get from mimeType if available
+    if (file.file?.mimeType) {
+      const mimeParts = file.file.mimeType.split("/");
+      return mimeParts[1]?.toUpperCase() || "File";
+    }
+
+    return "File";
+  }
+
+  formatFileSize(size) {
+    if (!size) {
+      return "—";
+    }
+    return I18n.toHumanSize(size);
   }
 
   _initialFolder() {
@@ -306,6 +395,68 @@ export default class CsDiscourseOnedrivePanel extends Component {
         return;
       }
 
+      // Fetch folder details to get the full path
+      try {
+        const folderResponse = await client
+          .api(
+            `/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}`
+          )
+          .select("name,parentReference,webUrl")
+          .get();
+
+        console.log("Folder response:", folderResponse);
+        console.log("Parent reference:", folderResponse.parentReference);
+
+        // Build the full path by traversing up the parent chain
+        const pathParts = [folderResponse.name];
+        let currentItem = folderResponse;
+        let maxDepth = 20; // Safety limit to prevent infinite loops
+
+        // Traverse up the parent chain to build the full path
+        while (currentItem.parentReference?.id && maxDepth > 0) {
+          maxDepth--;
+
+          // Check if we've reached root
+          if (
+            currentItem.parentReference.id === "root" ||
+            currentItem.parentReference.driveId !== driveId
+          ) {
+            break;
+          }
+
+          try {
+            const parentResponse = await client
+              .api(
+                `/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(currentItem.parentReference.id)}`
+              )
+              .select("name,parentReference")
+              .get();
+
+            // If parent is root or has no parent, stop
+            if (
+              !parentResponse.parentReference?.id ||
+              parentResponse.parentReference.id === "root"
+            ) {
+              break;
+            }
+
+            pathParts.unshift(parentResponse.name);
+            currentItem = parentResponse;
+          } catch (parentError) {
+            console.warn("Error fetching parent:", parentError);
+            break;
+          }
+        }
+
+        this.folderPath = pathParts.join("/");
+        console.log("Built folder path:", this.folderPath);
+      } catch (pathError) {
+        // If we can't fetch the path, fall back to just the name
+        console.warn("Could not fetch folder path:", pathError);
+        this.folderPath = this.folder.name;
+      }
+
+      // Fetch folder children
       const response = await client
         .api(
           `/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}/children`
@@ -906,6 +1057,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
     this.folder = response.folder || null;
     this.files = null;
     this.hasLoadedFiles = false;
+    this.folderPath = null;
   }
 
   async _removeFolder() {
@@ -919,6 +1071,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
     this.folder = response.folder || null;
     this.files = null;
     this.hasLoadedFiles = false;
+    this.folderPath = null;
   }
 
   @action
@@ -947,6 +1100,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
       this.accessToken = null;
       this.files = null;
       this.hasLoadedFiles = false;
+      this.folderPath = null;
     }
   }
 
@@ -1114,10 +1268,18 @@ export default class CsDiscourseOnedrivePanel extends Component {
                           target="_blank"
                           rel="noopener"
                         >
-                          {{this.folder.name}}
+                          {{#if this.folderPath}}
+                            {{this.folderPath}}
+                          {{else}}
+                            {{this.folder.name}}
+                          {{/if}}
                         </a>
                       {{else}}
-                        {{this.folder.name}}
+                        {{#if this.folderPath}}
+                          {{this.folderPath}}
+                        {{else}}
+                          {{this.folder.name}}
+                        {{/if}}
                       {{/if}}
                     </p>
                     {{#if this.refreshing}}
@@ -1129,44 +1291,118 @@ export default class CsDiscourseOnedrivePanel extends Component {
                       </div>
                     {{else if this.hasLoadedFiles}}
                       {{#if this.files.length}}
-                        <ul class="cs-onedrive-panel__list">
-                          {{#each this.files as |file|}}
-                            <li>
-                              {{#if file.webUrl}}
-                                <a
-                                  href={{file.webUrl}}
-                                  target="_blank"
-                                  rel="noopener"
-                                >
-                                  {{file.name}}
-                                </a>
-                              {{else}}
-                                {{file.name}}
-                              {{/if}}
-                            </li>
-                          {{/each}}
-                        </ul>
+                        <table class="cs-onedrive-panel__table">
+                          <thead>
+                            <tr>
+                              <th></th>
+                              <th>{{i18n
+                                  "cs_discourse_onedrive.file_name"
+                                }}</th>
+                              <th>{{i18n
+                                  "cs_discourse_onedrive.last_modified"
+                                }}</th>
+                              <th>{{i18n
+                                  "cs_discourse_onedrive.file_type"
+                                }}</th>
+                              <th>{{i18n
+                                  "cs_discourse_onedrive.file_size"
+                                }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {{#each this.files as |file|}}
+                              <tr>
+                                <td class="cs-onedrive-panel__icon-cell">
+                                  {{icon (this.getFileTypeIcon file)}}
+                                </td>
+                                <td class="cs-onedrive-panel__name-cell">
+                                  {{#if file.webUrl}}
+                                    <a
+                                      href={{file.webUrl}}
+                                      target="_blank"
+                                      rel="noopener"
+                                    >
+                                      {{file.name}}
+                                    </a>
+                                  {{else}}
+                                    {{file.name}}
+                                  {{/if}}
+                                </td>
+                                <td class="cs-onedrive-panel__date-cell">
+                                  {{#if file.lastModifiedDateTime}}
+                                    {{formatDate
+                                      file.lastModifiedDateTime
+                                      format="medium"
+                                    }}
+                                  {{else}}
+                                    —
+                                  {{/if}}
+                                </td>
+                                <td class="cs-onedrive-panel__type-cell">
+                                  {{this.getFileTypeName file}}
+                                </td>
+                                <td class="cs-onedrive-panel__size-cell">
+                                  {{this.formatFileSize file.size}}
+                                </td>
+                              </tr>
+                            {{/each}}
+                          </tbody>
+                        </table>
                       {{else}}
                         <p>{{i18n "cs_discourse_onedrive.no_files"}}</p>
                       {{/if}}
                     {{else if this.files}}
-                      <ul class="cs-onedrive-panel__list">
-                        {{#each this.files as |file|}}
-                          <li>
-                            {{#if file.webUrl}}
-                              <a
-                                href={{file.webUrl}}
-                                target="_blank"
-                                rel="noopener"
-                              >
-                                {{file.name}}
-                              </a>
-                            {{else}}
-                              {{file.name}}
-                            {{/if}}
-                          </li>
-                        {{/each}}
-                      </ul>
+                      <table class="cs-onedrive-panel__table">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>{{i18n "cs_discourse_onedrive.file_name"}}</th>
+                            <th>{{i18n
+                                "cs_discourse_onedrive.last_modified"
+                              }}</th>
+                            <th>{{i18n "cs_discourse_onedrive.file_type"}}</th>
+                            <th>{{i18n "cs_discourse_onedrive.file_size"}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {{#each this.files as |file|}}
+                            <tr>
+                              <td class="cs-onedrive-panel__icon-cell">
+                                {{icon (this.getFileTypeIcon file)}}
+                              </td>
+                              <td class="cs-onedrive-panel__name-cell">
+                                {{#if file.webUrl}}
+                                  <a
+                                    href={{file.webUrl}}
+                                    target="_blank"
+                                    rel="noopener"
+                                  >
+                                    {{file.name}}
+                                  </a>
+                                {{else}}
+                                  {{file.name}}
+                                {{/if}}
+                              </td>
+                              <td class="cs-onedrive-panel__date-cell">
+                                {{#if file.lastModifiedDateTime}}
+                                  {{formatDate
+                                    file.lastModifiedDateTime
+                                    format="medium"
+                                  }}
+                                {{else}}
+                                  —
+                                {{/if}}
+                              </td>
+                              <td class="cs-onedrive-panel__type-cell">
+                                {{this.getFileTypeName file}}
+                              </td>
+                              <td class="cs-onedrive-panel__size-cell">
+                                {{this.formatFileSize file.size}}
+                              </td>
+                            </tr>
+                          {{/each}}
+                        </tbody>
+                      </table>
                     {{/if}}
                   </div>
                 </div>

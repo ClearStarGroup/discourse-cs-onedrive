@@ -12,6 +12,12 @@ enabled_site_setting :cs_discourse_onedrive_enabled
 
 register_asset "stylesheets/common/cs-discourse-onedrive.scss"
 register_svg_icon "cloud"
+register_svg_icon "file-pdf"
+register_svg_icon "file-word"
+register_svg_icon "file-excel"
+register_svg_icon "file-powerpoint"
+register_svg_icon "file-csv"
+register_svg_icon "file-zipper"
 
 module ::CsDiscourseOneDriveModule
   PLUGIN_NAME = "cs-discourse-onedrive"

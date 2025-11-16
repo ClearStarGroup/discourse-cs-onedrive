@@ -28,3 +28,7 @@ en:
       save_error: "We couldn't save the linked folder. Please try again."
       refresh_error: "We couldn't refresh the folder contents. Please try again."
       auth_error: "Authentication failed. Please try signing in again."
+      file_name: "Name"
+      last_modified: "Last Mod"
+      file_type: "Type"
+      file_size: "Size"
