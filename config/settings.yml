@@ -6,5 +6,11 @@ plugins:
     default: ""
     client: true
   cs_discourse_onedrive_tenant_id:
-    default: "common"
+    default: ""
+    client: true
+  cs_discourse_onedrive_sharepoint_base_url:
+    default: ""
+    client: true
+  cs_discourse_onedrive_sharepoint_site_name:
+    default: ""
     client: true

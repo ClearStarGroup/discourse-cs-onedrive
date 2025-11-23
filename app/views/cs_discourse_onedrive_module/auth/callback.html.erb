@@ -14,10 +14,19 @@
         return;
       }
 
+      const clientId = "<%= SiteSetting.cs_discourse_onedrive_client_id %>";
+      const tenantId = "<%= SiteSetting.cs_discourse_onedrive_tenant_id %>";
+      
+      if (!clientId || !tenantId || tenantId === "common") {
+        console.error("OneDrive configuration is missing or invalid");
+        window.location.replace("<%= Discourse.base_path %>");
+        return;
+      }
+
       const configuration = {
         auth: {
-          clientId: "<%= SiteSetting.cs_discourse_onedrive_client_id %>",
-          authority: "https://login.microsoftonline.com/<%= SiteSetting.cs_discourse_onedrive_tenant_id.presence || "common" %>",
+          clientId: clientId,
+          authority: "https://login.microsoftonline.com/" + tenantId,
           redirectUri: "<%= Discourse.base_url %>/cs-discourse-onedrive/auth/callback",
         },
         cache: {
@@ -28,17 +37,12 @@
 
       try {
         const client = new msal.PublicClientApplication(configuration);
-        if (client.initialize) {
-          await client.initialize();
-        }
+        await client.initialize();
         await client.handleRedirectPromise();
       } catch (e) {
         console.error("MSAL redirect handling failed", e);
       } finally {
-        const target =
-          sessionStorage.getItem("csod.msal.redirect") ||
-          sessionStorage.getItem("msal.redirectUri") ||
-          "<%= Discourse.base_path %>";
+        const target = sessionStorage.getItem("csod.msal.redirect") || Discourse.base_path;
         sessionStorage.removeItem("csod.msal.redirect");
         window.location.replace(target);
       }
@@ -46,4 +50,3 @@
     </script>
   </body>
 </html>
-

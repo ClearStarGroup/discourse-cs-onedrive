@@ -8,9 +8,13 @@
 # url: TODO
 # required_version: 2.7.0
 
+# Which of our settings turns the plugin on or off
 enabled_site_setting :cs_discourse_onedrive_enabled
 
+# Register custom SCSS for the plugin
 register_asset "stylesheets/common/cs-discourse-onedrive.scss"
+
+# Register SVG icons for the plugin
 register_svg_icon "cloud"
 register_svg_icon "file-pdf"
 register_svg_icon "file-word"
@@ -20,10 +24,13 @@ register_svg_icon "file-csv"
 register_svg_icon "file-zipper"
 
 module ::CsDiscourseOneDriveModule
+  # The name of the plugin
   PLUGIN_NAME = "cs-discourse-onedrive"
 
+  # The name of the custom field we use to store the folder for a topic
   FOLDER_FIELD = "cs_discourse_onedrive_folder"
 
+  # Helper method to get the folder for a topic (called only by serialize_for below)
   def self.folder_from(topic)
     raw = topic.custom_fields[FOLDER_FIELD]
     return if raw.blank?
@@ -33,40 +40,35 @@ module ::CsDiscourseOneDriveModule
     nil
   end
 
-  def self.serialize_for(topic, guardian)
+  # Helper method to serialize the folder for a topic (called by the topic_view serializers below)
+  def self.serialize_for(topic)
     {
       folder: folder_from(topic),
-      can_manage: guardian.can_edit?(topic&.first_post),
     }
   end
 end
 
+# Load the engine to enable routes to be registered (happens before after_initialize called)
 require_relative "lib/cs_discourse_onedrive_module/engine"
 
 after_initialize do
+  # Load the controllers for the plugin
   require_relative "app/controllers/cs_discourse_onedrive_module/auth_controller"
   require_relative "app/controllers/cs_discourse_onedrive_module/folders_controller"
 
+  # Register the custom field type we use to store the folder for a topic
   register_topic_custom_field_type(CsDiscourseOneDriveModule::FOLDER_FIELD, :json)
+
+  # Ensure this field is included in topic objects to avoid N+1 queries
   TopicList.preloaded_custom_fields << CsDiscourseOneDriveModule::FOLDER_FIELD
 
-  TopicView.on_preload do |topic_view|
-    topic_view.topic&.custom_fields&.[](CsDiscourseOneDriveModule::FOLDER_FIELD)
-  end
-
+  # Delete the folder for a topic when it is destroyed
   add_model_callback Topic, :before_destroy do
     custom_fields.delete(CsDiscourseOneDriveModule::FOLDER_FIELD) if custom_fields.present?
   end
 
+  # Add the linked folder to the topic object where serializing topics
   add_to_serializer(:topic_view, :cs_discourse_onedrive) do
-    CsDiscourseOneDriveModule.serialize_for(object.topic, scope)
-  end
-
-  add_to_serializer(
-    :post,
-    :cs_discourse_onedrive,
-    include_condition: -> { object.is_first_post? }
-  ) do
-    CsDiscourseOneDriveModule.serialize_for(object.topic, scope)
+    CsDiscourseOneDriveModule.serialize_for(object.topic)
   end
 end

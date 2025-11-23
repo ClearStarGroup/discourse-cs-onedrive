@@ -1,0 +1,6 @@
+{
+  // Disable format-on-save for Glimmer files to preserve {{else if}} syntax
+  "[glimmer-js]": {
+    "editor.formatOnSave": false
+  }
+}

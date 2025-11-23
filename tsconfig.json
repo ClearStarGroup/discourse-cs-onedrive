@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowJs": true
+  },
+  "include": ["assets/**/*.js"],
+  "exclude": ["**/*.gjs", "**/*.gts"]
+}
