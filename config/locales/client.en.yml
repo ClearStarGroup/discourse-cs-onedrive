@@ -28,3 +28,7 @@ en:
       last_modified: "Last Mod"
       file_type: "Type"
       file_size: "Size"
+    action_codes:
+      onedrive_folder_linked: "Linked OneDrive folder <a href='%{folder_url}' target='_blank'>%{folder_name}</a> %{when}"
+      onedrive_folder_changed: "Changed the linked OneDrive folder to <a href='%{folder_url}' target='_blank'>%{folder_name}</a> %{when}"
+      onedrive_folder_cleared: "Cleared the linked OneDrive folder <a href='%{folder_url}' target='_blank'>%{folder_name}</a> %{when}"

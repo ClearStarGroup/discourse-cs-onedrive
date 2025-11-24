@@ -71,4 +71,28 @@ after_initialize do
   add_to_serializer(:topic_view, :cs_discourse_onedrive) do
     CsDiscourseOneDriveModule.serialize_for(object.topic)
   end
+
+  # Add our custom fields to the post custom fields allowlist
+  # This ensures they're included when serializing posts in topic views
+  TopicView.add_post_custom_fields_allowlister do |user, topic|
+    ["onedrive_folder_name", "onedrive_folder_path"]
+  end
+
+  # Add custom fields for OneDrive folder name and path to post serializer
+  # These are used by small action posts to display folder links
+  add_to_serializer(:post, :onedrive_folder_name) do
+    post_custom_fields["onedrive_folder_name"]
+  end
+
+  add_to_serializer(:post, :include_onedrive_folder_name?) do
+    post_custom_fields["onedrive_folder_name"].present?
+  end
+
+  add_to_serializer(:post, :onedrive_folder_path) do
+    post_custom_fields["onedrive_folder_path"]
+  end
+
+  add_to_serializer(:post, :include_onedrive_folder_path?) do
+    post_custom_fields["onedrive_folder_path"].present?
+  end
 end

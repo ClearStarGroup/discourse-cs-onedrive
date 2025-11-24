@@ -55,7 +55,6 @@ See contents of /docs for technical solution notes
 
 ## Backlog
 
-[] Small action post update on setting, changing, or clearing linked folder
 [] Support navigating into folders in panel
 [] Support uploading files into panel
 [] Support button to enable inserting link to file from linked folder in editor

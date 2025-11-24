@@ -43,9 +43,37 @@ module ::CsDiscourseOneDriveModule
         )
       end
 
+      # Check if folder already exists (to distinguish "set" from "changed")
+      existing_folder = @topic.custom_fields[FOLDER_FIELD]
+      is_change = existing_folder.present?
+
+      # Extract folder name and URL
+      folder_name = folder[:name]
+      folder_url = folder[:web_url]
+      if folder_name.blank? || folder_url.blank?
+        raise Discourse::InvalidParameters.new(
+          I18n.t("cs_discourse_onedrive.errors.missing_folder_params"),
+        )
+      end
+
       # Update topic custom field with parsed folder data
       @topic.custom_fields[FOLDER_FIELD] = folder
       @topic.save_custom_fields(true)
+
+      # Create small action post (use add_moderator_post to preserve custom_fields)
+      action_code = is_change ? "onedrive_folder_changed" : "onedrive_folder_linked"
+      @topic.add_moderator_post(
+        current_user,
+        nil,
+        post_type: Post.types[:small_action],
+        action_code: action_code,
+        bump: false,
+        silent: true,
+        custom_fields: {
+          "onedrive_folder_name" => folder_name.to_s,
+          "onedrive_folder_path" => folder_url.to_s,
+        },
+      )
 
       # Return success response
       head :ok
@@ -53,9 +81,30 @@ module ::CsDiscourseOneDriveModule
 
     # ROUTE: delete the folder for a topic
     def delete
+      # Capture folder info before deletion using the helper method for consistency
+      existing_folder = CsDiscourseOneDriveModule.folder_from(@topic)
+      folder_name = existing_folder&.dig("name") || existing_folder&.dig(:name)
+      folder_url = existing_folder&.dig("web_url") || existing_folder&.dig(:web_url)
+
       # Delete folder custom field from topic
       @topic.custom_fields.delete(FOLDER_FIELD)
       @topic.save_custom_fields(true)
+
+      # Create small action post (only if folder existed and has a name)
+      if folder_name.present?
+        @topic.add_moderator_post(
+          current_user,
+          nil,
+          post_type: Post.types[:small_action],
+          action_code: "onedrive_folder_cleared",
+          bump: false,
+          silent: true,
+          custom_fields: {
+            "onedrive_folder_name" => folder_name.to_s,
+            "onedrive_folder_path" => folder_url.to_s,
+          },
+        )
+      end
 
       # Return success response
       head :ok

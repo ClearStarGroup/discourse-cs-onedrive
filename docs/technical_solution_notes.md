@@ -23,7 +23,8 @@
 - File listing: Import `@microsoft/microsoft-graph-client` directly from vendor assets in `onedrive-api-service.js`, which exports `graphLibrary` constant. Use `graphLibrary.Client.init` to create Graph clients before issuing Graph requests.
 - Folder selection: Integrate the official OneDrive/Graph JavaScript picker (`microsoft-file-picker`) to browse and select folders; ensure callback persists drive + item IDs alongside display name/path; the folder owner still needs to grant Microsoft-level access to intended viewers.
 - Permissions: reuse Discourse’s built-in ability_to_edit_post checks—only users who can edit the topic’s first post (topic owner, staff, or others with edit rights) can link/change/delete folders. All other viewers see the linked folder (if any) but no management controls; evaluation of extra group gating is unnecessary.
-- Background jobs: not required. All Graph calls happen client-side with the viewer’s tokens; rely on user-triggered refresh or per-viewer caching. Webhook-driven nudges can be considered later without server-side jobs.
+- Background jobs: not required. All Graph calls happen client-side with the viewer's tokens; rely on user-triggered refresh or per-viewer caching. Webhook-driven nudges can be considered later without server-side jobs.
+- Action posts: Small action posts are automatically created when a OneDrive folder is linked, changed, or cleared. These posts appear in the topic's post stream with a compact UI (icon + description) and don't count as regular replies or bump the topic. The posts display the folder name as a clickable link that opens the OneDrive folder in a new tab.
 
 ## Updating MSAL/Graph
 
