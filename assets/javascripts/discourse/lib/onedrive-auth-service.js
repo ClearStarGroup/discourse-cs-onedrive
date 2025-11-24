@@ -3,7 +3,7 @@ import { extractError } from "discourse/lib/ajax-error";
 import { getAbsoluteURL } from "discourse/lib/get-url";
 import { i18n } from "discourse-i18n";
 
-const REDIRECT_PATH = "/cs-discourse-onedrive/auth/callback";
+const REDIRECT_PATH = "/discourse-cs-onedrive/auth/callback";
 const GRAPH_SCOPES = ["Files.Read.All"];
 
 // Get MSAL global from window after vendor library loads
@@ -43,13 +43,13 @@ export async function getMsalClient(siteSettings) {
   }
 
   // Check if client ID is configured
-  const clientId = siteSettings.cs_discourse_onedrive_client_id;
+  const clientId = siteSettings.discourse_cs_onedrive_client_id;
   if (!clientId) {
     return null;
   }
 
   // Check if tenant ID is configured
-  const tenantId = siteSettings.cs_discourse_onedrive_tenant_id;
+  const tenantId = siteSettings.discourse_cs_onedrive_tenant_id;
   if (!tenantId || tenantId === "common") {
     throw new Error(
       "OneDrive tenant ID must be configured. Set it in site settings to your Azure AD tenant ID."
@@ -112,10 +112,10 @@ export async function getAccounts(siteSettings) {
 function getScopesForResource(siteSettings, resource) {
   if (resource === "sharepoint") {
     const sharePointBaseUrl =
-      siteSettings.cs_discourse_onedrive_sharepoint_base_url;
+      siteSettings.discourse_cs_onedrive_sharepoint_base_url;
     if (!sharePointBaseUrl || sharePointBaseUrl.trim() === "") {
       throw new Error(
-        "SharePoint base URL is not configured. Please set cs_discourse_onedrive_sharepoint_base_url in site settings."
+        "SharePoint base URL is not configured. Please set discourse_cs_onedrive_sharepoint_base_url in site settings."
       );
     }
     return [`${sharePointBaseUrl}/.default`];

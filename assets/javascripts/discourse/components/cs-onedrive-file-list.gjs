@@ -6,7 +6,7 @@ import {
   getFileTypeIcon,
   getFileTypeName,
   formatFileSize,
-} from "discourse/plugins/cs-discourse-onedrive/discourse/lib/file-type-utils";
+} from "discourse/plugins/discourse-cs-onedrive/discourse/lib/file-type-utils";
 
 export default class CsOnedriveFileList extends Component {
   get files() {
@@ -23,10 +23,10 @@ export default class CsOnedriveFileList extends Component {
         <thead>
           <tr>
             <th></th>
-            <th>{{i18n "cs_discourse_onedrive.file_name"}}</th>
-            <th>{{i18n "cs_discourse_onedrive.last_modified"}}</th>
-            <th>{{i18n "cs_discourse_onedrive.file_type"}}</th>
-            <th>{{i18n "cs_discourse_onedrive.file_size"}}</th>
+            <th>{{i18n "discourse_cs_onedrive.file_name"}}</th>
+            <th>{{i18n "discourse_cs_onedrive.last_modified"}}</th>
+            <th>{{i18n "discourse_cs_onedrive.file_type"}}</th>
+            <th>{{i18n "discourse_cs_onedrive.file_size"}}</th>
           </tr>
         </thead>
         <tbody>
@@ -62,7 +62,7 @@ export default class CsOnedriveFileList extends Component {
         </tbody>
       </table>
     {{else if this.args.files}}
-      <p>{{i18n "cs_discourse_onedrive.no_files"}}</p>
+      <p>{{i18n "discourse_cs_onedrive.no_files"}}</p>
     {{/if}}
   </template>
 }

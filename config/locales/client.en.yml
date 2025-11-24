@@ -3,10 +3,10 @@ en:
     admin:
       site_settings:
         categories:
-          cs_discourse_onedrive: "Clear Star Discourse OneDrive Integration"
+          discourse_cs_onedrive: "Clear Star Discourse OneDrive Integration"
 
   js:
-    cs_discourse_onedrive:
+    discourse_cs_onedrive:
       sign_in: "Sign in to OneDrive"
       sign_out: "Sign out"
       not_configured: "OneDrive plugin is not configured - please check settings."

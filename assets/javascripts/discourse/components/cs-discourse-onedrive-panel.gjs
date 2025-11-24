@@ -11,19 +11,19 @@ import {
   handleRedirectResult,
   signOut as authSignOut,
   surfaceError,
-} from "discourse/plugins/cs-discourse-onedrive/discourse/lib/onedrive-auth-service";
-import { openPicker } from "discourse/plugins/cs-discourse-onedrive/discourse/lib/onedrive-picker-service";
+} from "discourse/plugins/discourse-cs-onedrive/discourse/lib/onedrive-auth-service";
+import { openPicker } from "discourse/plugins/discourse-cs-onedrive/discourse/lib/onedrive-picker-service";
 import {
   loadFiles,
   persistFolder,
   removeFolder,
-} from "discourse/plugins/cs-discourse-onedrive/discourse/lib/onedrive-api-service";
-import CsOnedriveFileList from "discourse/plugins/cs-discourse-onedrive/discourse/components/cs-onedrive-file-list";
-import CsOnedriveFolderHeader from "discourse/plugins/cs-discourse-onedrive/discourse/components/cs-onedrive-folder-header";
-import CsOnedriveFolderLink from "discourse/plugins/cs-discourse-onedrive/discourse/components/cs-onedrive-folder-link";
-import CsOnedriveSignInPrompt from "discourse/plugins/cs-discourse-onedrive/discourse/components/cs-onedrive-sign-in-prompt";
-import CsOnedriveLinkPrompt from "discourse/plugins/cs-discourse-onedrive/discourse/components/cs-onedrive-link-prompt";
-import CsOnedriveErrorAlert from "discourse/plugins/cs-discourse-onedrive/discourse/components/cs-onedrive-error-alert";
+} from "discourse/plugins/discourse-cs-onedrive/discourse/lib/onedrive-api-service";
+import CsOnedriveFileList from "discourse/plugins/discourse-cs-onedrive/discourse/components/cs-onedrive-file-list";
+import CsOnedriveFolderHeader from "discourse/plugins/discourse-cs-onedrive/discourse/components/cs-onedrive-folder-header";
+import CsOnedriveFolderLink from "discourse/plugins/discourse-cs-onedrive/discourse/components/cs-onedrive-folder-link";
+import CsOnedriveSignInPrompt from "discourse/plugins/discourse-cs-onedrive/discourse/components/cs-onedrive-sign-in-prompt";
+import CsOnedriveLinkPrompt from "discourse/plugins/discourse-cs-onedrive/discourse/components/cs-onedrive-link-prompt";
+import CsOnedriveErrorAlert from "discourse/plugins/discourse-cs-onedrive/discourse/components/cs-onedrive-error-alert";
 
 export default class CsDiscourseOnedrivePanel extends Component {
   @service currentUser;
@@ -55,21 +55,21 @@ export default class CsDiscourseOnedrivePanel extends Component {
 
   // Is the plugin enabled? If not, we'll do nothing and show nothing.
   get isEnabled() {
-    return this.siteSettings.cs_discourse_onedrive_enabled;
+    return this.siteSettings.discourse_cs_onedrive_enabled;
   }
 
   // Is all the plugin configuration present and valid? If not we'll just show an error.
   get isConfigured() {
     return (
-      this.siteSettings.cs_discourse_onedrive_client_id &&
-      this.siteSettings.cs_discourse_onedrive_client_id.trim().length > 0 &&
-      this.siteSettings.cs_discourse_onedrive_tenant_id &&
-      this.siteSettings.cs_discourse_onedrive_tenant_id.trim().length > 0 &&
-      this.siteSettings.cs_discourse_onedrive_sharepoint_base_url &&
-      this.siteSettings.cs_discourse_onedrive_sharepoint_base_url.trim()
+      this.siteSettings.discourse_cs_onedrive_client_id &&
+      this.siteSettings.discourse_cs_onedrive_client_id.trim().length > 0 &&
+      this.siteSettings.discourse_cs_onedrive_tenant_id &&
+      this.siteSettings.discourse_cs_onedrive_tenant_id.trim().length > 0 &&
+      this.siteSettings.discourse_cs_onedrive_sharepoint_base_url &&
+      this.siteSettings.discourse_cs_onedrive_sharepoint_base_url.trim()
         .length > 0 &&
-      this.siteSettings.cs_discourse_onedrive_sharepoint_site_name &&
-      this.siteSettings.cs_discourse_onedrive_sharepoint_site_name.trim()
+      this.siteSettings.discourse_cs_onedrive_sharepoint_site_name &&
+      this.siteSettings.discourse_cs_onedrive_sharepoint_site_name.trim()
         .length > 0
     );
   }
@@ -101,8 +101,8 @@ export default class CsDiscourseOnedrivePanel extends Component {
 
     // Initialize folder from args (synchronous, happens before async operations)
     this.folder =
-      this.args.post?.cs_discourse_onedrive?.folder ||
-      this.args.post?.topic?.cs_discourse_onedrive?.folder ||
+      this.args.post?.discourse_cs_onedrive?.folder ||
+      this.args.post?.topic?.discourse_cs_onedrive?.folder ||
       null;
 
     // Load data if we have a linked folder and a signed in account
@@ -131,7 +131,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
     } catch (error) {
       const errorMessage = surfaceError(
         error,
-        "cs_discourse_onedrive.refresh_error"
+        "discourse_cs_onedrive.refresh_error"
       );
       this.errorMessage = errorMessage;
       throw error;
@@ -150,7 +150,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
     } catch (error) {
       this.errorMessage = surfaceError(
         error,
-        "cs_discourse_onedrive.auth_error"
+        "discourse_cs_onedrive.auth_error"
       );
     }
   }
@@ -166,7 +166,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
     } catch (error) {
       this.errorMessage = surfaceError(
         error,
-        "cs_discourse_onedrive.auth_error"
+        "discourse_cs_onedrive.auth_error"
       );
     }
 
@@ -196,7 +196,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
       await this._loadData();
     } catch (error) {
       if (error?.message !== "cancelled") {
-        this.errorMessage = i18n("cs_discourse_onedrive.picker_error");
+        this.errorMessage = i18n("discourse_cs_onedrive.picker_error");
       }
     } finally {
       this.linking = false;
@@ -209,7 +209,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
       return;
     }
 
-    if (!confirm(i18n("cs_discourse_onedrive.confirm_remove"))) {
+    if (!confirm(i18n("discourse_cs_onedrive.confirm_remove"))) {
       return;
     }
 
@@ -223,7 +223,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
     } catch (error) {
       this.errorMessage = surfaceError(
         error,
-        "cs_discourse_onedrive.remove_error"
+        "discourse_cs_onedrive.remove_error"
       );
     }
   }
@@ -251,7 +251,7 @@ export default class CsDiscourseOnedrivePanel extends Component {
             <div class="cooked">
               {{#unless this.isConfigured}}
                 <CsOnedriveErrorAlert
-                  @errorMessage={{i18n "cs_discourse_onedrive.not_configured"}}
+                  @errorMessage={{i18n "discourse_cs_onedrive.not_configured"}}
                 />
               {{else if this.errorMessage}}
                 <CsOnedriveErrorAlert @errorMessage={{this.errorMessage}} />

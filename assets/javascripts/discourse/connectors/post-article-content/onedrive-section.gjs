@@ -1,5 +1,5 @@
 import { eq } from "discourse/truth-helpers";
-import CsDiscourseOnedrivePanel from "discourse/plugins/cs-discourse-onedrive/discourse/components/cs-discourse-onedrive-panel";
+import CsDiscourseOnedrivePanel from "discourse/plugins/discourse-cs-onedrive/discourse/components/cs-discourse-onedrive-panel";
 
 const OneDriveSection = <template>
   {{yield @outletArgs}}

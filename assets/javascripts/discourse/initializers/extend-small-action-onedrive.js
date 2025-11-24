@@ -51,7 +51,7 @@ export default {
               return super.description;
             }
           },
-        { pluginId: "cs-discourse-onedrive" }
+        { pluginId: "discourse-cs-onedrive" }
       );
     });
   },

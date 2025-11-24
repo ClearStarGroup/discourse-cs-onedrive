@@ -66,20 +66,20 @@ function sendErrorResponse(
  */
 function validateSiteSettings(siteSettings) {
   const sharePointBaseUrl =
-    siteSettings.cs_discourse_onedrive_sharepoint_base_url;
+    siteSettings.discourse_cs_onedrive_sharepoint_base_url;
 
   if (!sharePointBaseUrl || sharePointBaseUrl.trim() === "") {
     throw new Error(
-      "SharePoint base URL is not configured. Please set cs_discourse_onedrive_sharepoint_base_url in site settings."
+      "SharePoint base URL is not configured. Please set discourse_cs_onedrive_sharepoint_base_url in site settings."
     );
   }
 
   const sharePointSiteName =
-    siteSettings.cs_discourse_onedrive_sharepoint_site_name;
+    siteSettings.discourse_cs_onedrive_sharepoint_site_name;
 
   if (!sharePointSiteName || sharePointSiteName.trim() === "") {
     throw new Error(
-      "SharePoint site name is not configured. Please set cs_discourse_onedrive_sharepoint_site_name in site settings."
+      "SharePoint site name is not configured. Please set discourse_cs_onedrive_sharepoint_site_name in site settings."
     );
   }
 }
@@ -155,7 +155,7 @@ function handlePickCommand(port, msg, command, cleanupFn, resolve, reject) {
   const items = command.items || [];
   if (items.length === 0 || !items[0]) {
     sendErrorResponse(port, msg.id, "noSelection", "No folder selected");
-    reject(new Error(i18n("cs_discourse_onedrive.picker_requires_folder")));
+    reject(new Error(i18n("discourse_cs_onedrive.picker_requires_folder")));
     return;
   }
 
@@ -411,9 +411,9 @@ export async function openPicker(siteSettings, account) {
   validateSiteSettings(siteSettings);
 
   const sharePointBaseUrl =
-    siteSettings.cs_discourse_onedrive_sharepoint_base_url;
+    siteSettings.discourse_cs_onedrive_sharepoint_base_url;
   const sharePointSiteName =
-    siteSettings.cs_discourse_onedrive_sharepoint_site_name;
+    siteSettings.discourse_cs_onedrive_sharepoint_site_name;
 
   // Construct the full SharePoint site URL
   const sharePointSiteUrl = `${sharePointBaseUrl}/sites/${sharePointSiteName}`;

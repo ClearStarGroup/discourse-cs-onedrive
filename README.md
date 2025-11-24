@@ -9,7 +9,7 @@ Follow the directions at [Install a Plugin](https://meta.discourse.org/t/install
 ### Microsoft Azure Setup
 
 1. Create an [Azure App Registration](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade) for a Single Tenant App
-2. Configure redirect URI: `https://your-discourse-site.com/cs-discourse-onedrive/auth/callback`
+2. Configure redirect URI: `https://your-discourse-site.com/discourse-cs-onedrive/auth/callback`
 3. Add API permissions (Microsoft Graph):
    - `Files.Read.All` (Delegated) - Required for reading OneDrive files and folders
    - `Sites.Read.All` (Delegated) - Required for SharePoint/OneDrive file picker functionality
@@ -21,11 +21,11 @@ Follow the directions at [Install a Plugin](https://meta.discourse.org/t/install
 
 After installation, configure the plugin in **Admin > Settings > Plugins**:
 
-1. Enable the plugin by checking **cs_discourse_onedrive_enabled**
-2. Set **cs_discourse_onedrive_client_id** to your Microsoft Azure App Registration Client ID
-3. Set **cs_discourse_onedrive_tenant_id** to your Tenant ID
-4. Set **cs_discourse_onedrive_sharepoint_base_url** to your SharePoint base URL (e.g., `https://contoso.sharepoint.com`)
-5. Set **cs_discourse_onedrive_sharepoint_site_name** to your SharePoint site name (e.g., `AllCompany`)
+1. Enable the plugin by checking **discourse_cs_onedrive_enabled**
+2. Set **discourse_cs_onedrive_client_id** to your Microsoft Azure App Registration Client ID
+3. Set **discourse_cs_onedrive_tenant_id** to your Tenant ID
+4. Set **discourse_cs_onedrive_sharepoint_base_url** to your SharePoint base URL (e.g., `https://contoso.sharepoint.com`)
+5. Set **discourse_cs_onedrive_sharepoint_site_name** to your SharePoint site name (e.g., `AllCompany`)
 
 ## Features
 

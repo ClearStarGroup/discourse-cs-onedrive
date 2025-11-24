@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ::CsDiscourseOneDriveModule
+module ::DiscourseCsOnedriveModule
   class AuthController < ::ApplicationController
     # Ensure the plugin is loaded before this controller is used
     requires_plugin PLUGIN_NAME 
@@ -19,7 +19,7 @@ module ::CsDiscourseOneDriveModule
 
     def callback
       # View will handle the MSAL redirect processing
-      render template: "cs_discourse_onedrive_module/auth/callback", layout: false
+      render template: "discourse_cs_onedrive_module/auth/callback", layout: false
     end
   end
 end

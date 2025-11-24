@@ -118,7 +118,7 @@ export async function loadFiles(folder, siteSettings, account) {
       files,
     };
   } catch (error) {
-    surfaceError(error, "cs_discourse_onedrive.refresh_error");
+    surfaceError(error, "discourse_cs_onedrive.refresh_error");
     throw error;
   }
 }
@@ -130,7 +130,7 @@ export async function loadFiles(folder, siteSettings, account) {
  * @returns {Promise<null>} Promise resolving to null (folder saved)
  */
 export async function persistFolder(topicId, folder) {
-  const url = `/cs-discourse-onedrive/topics/${topicId}/folder`;
+  const url = `/discourse-cs-onedrive/topics/${topicId}/folder`;
 
   try {
     await ajax(url, {
@@ -138,7 +138,7 @@ export async function persistFolder(topicId, folder) {
       data: { folder },
     });
   } catch (error) {
-    surfaceError(error, "cs_discourse_onedrive.save_error");
+    surfaceError(error, "discourse_cs_onedrive.save_error");
     throw error;
   }
 }
@@ -149,14 +149,14 @@ export async function persistFolder(topicId, folder) {
  * @returns {Promise<null>} Promise resolving to null (folder removed)
  */
 export async function removeFolder(topicId) {
-  const url = `/cs-discourse-onedrive/topics/${topicId}/folder`;
+  const url = `/discourse-cs-onedrive/topics/${topicId}/folder`;
 
   try {
     await ajax(url, {
       type: "DELETE",
     });
   } catch (error) {
-    surfaceError(error, "cs_discourse_onedrive.save_error");
+    surfaceError(error, "discourse_cs_onedrive.save_error");
     throw error;
   }
 }

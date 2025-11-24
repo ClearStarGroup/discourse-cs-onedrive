@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ::CsDiscourseOneDriveModule
+module ::DiscourseCsOnedriveModule
   class FoldersController < ::ApplicationController
     # Ensure the plugin is loaded before this controller is used
     requires_plugin PLUGIN_NAME
@@ -39,7 +39,7 @@ module ::CsDiscourseOneDriveModule
       # Validate required fields
       if folder[:drive_id].blank? || folder[:item_id].blank?
         raise Discourse::InvalidParameters.new(
-          I18n.t("cs_discourse_onedrive.errors.missing_folder_params"),
+          I18n.t("discourse_cs_onedrive.errors.missing_folder_params"),
         )
       end
 
@@ -52,7 +52,7 @@ module ::CsDiscourseOneDriveModule
       folder_url = folder[:web_url]
       if folder_name.blank? || folder_url.blank?
         raise Discourse::InvalidParameters.new(
-          I18n.t("cs_discourse_onedrive.errors.missing_folder_params"),
+          I18n.t("discourse_cs_onedrive.errors.missing_folder_params"),
         )
       end
 
@@ -82,7 +82,7 @@ module ::CsDiscourseOneDriveModule
     # ROUTE: delete the folder for a topic
     def delete
       # Capture folder info before deletion using the helper method for consistency
-      existing_folder = CsDiscourseOneDriveModule.folder_from(@topic)
+      existing_folder = DiscourseCsOnedriveModule.folder_from(@topic)
       folder_name = existing_folder&.dig("name") || existing_folder&.dig(:name)
       folder_url = existing_folder&.dig("web_url") || existing_folder&.dig(:web_url)
 

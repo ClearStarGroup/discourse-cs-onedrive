@@ -1,16 +1,16 @@
 plugins:
-  cs_discourse_onedrive_enabled:
+  discourse_cs_onedrive_enabled:
     default: false
     client: true
-  cs_discourse_onedrive_client_id:
+  discourse_cs_onedrive_client_id:
     default: ""
     client: true
-  cs_discourse_onedrive_tenant_id:
+  discourse_cs_onedrive_tenant_id:
     default: ""
     client: true
-  cs_discourse_onedrive_sharepoint_base_url:
+  discourse_cs_onedrive_sharepoint_base_url:
     default: ""
     client: true
-  cs_discourse_onedrive_sharepoint_site_name:
+  discourse_cs_onedrive_sharepoint_site_name:
     default: ""
     client: true

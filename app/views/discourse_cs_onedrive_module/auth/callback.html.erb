@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Connecting to OneDrive…</title>
-    <script src="<%= Discourse.base_path %>/plugins/cs-discourse-onedrive/javascripts/vendor/msal-browser.min.js" nonce="<%= csp_nonce_placeholder %>"></script>
+    <script src="<%= Discourse.base_path %>/plugins/discourse-cs-onedrive/javascripts/vendor/msal-browser.min.js" nonce="<%= csp_nonce_placeholder %>"></script>
   </head>
   <body>
     <script nonce="<%= csp_nonce_placeholder %>">
@@ -14,8 +14,8 @@
         return;
       }
 
-      const clientId = "<%= SiteSetting.cs_discourse_onedrive_client_id %>";
-      const tenantId = "<%= SiteSetting.cs_discourse_onedrive_tenant_id %>";
+      const clientId = "<%= SiteSetting.discourse_cs_onedrive_client_id %>";
+      const tenantId = "<%= SiteSetting.discourse_cs_onedrive_tenant_id %>";
       
       if (!clientId || !tenantId || tenantId === "common") {
         console.error("OneDrive configuration is missing or invalid");
@@ -27,7 +27,7 @@
         auth: {
           clientId: clientId,
           authority: "https://login.microsoftonline.com/" + tenantId,
-          redirectUri: "<%= Discourse.base_url %>/cs-discourse-onedrive/auth/callback",
+          redirectUri: "<%= Discourse.base_url %>/discourse-cs-onedrive/auth/callback",
         },
         cache: {
           cacheLocation: "sessionStorage",
